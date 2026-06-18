@@ -76,6 +76,8 @@ async def handle_exception(e):
 bp = create_operacion_blueprint(type('ServiceProxy', (), {
     'create_viaje': lambda self, data: g.service.create_viaje(data),
     'get_viajes': lambda self, inicio, fin: g.service.get_viajes(inicio, fin),
+    'update_viaje': lambda self, id, data: g.service.update_viaje(id, data),
+    'delete_viaje': lambda self, id: g.service.delete_viaje(id),
     'check_db_health': lambda self: g.service.check_db_health(),
 })())
 
