@@ -20,11 +20,13 @@ def create_operacion_blueprint(service):
     @require_permission('operacion', 'edit')
     async def create_viaje():
         data = await request.get_json()
-        # Convert strings to date objects if necessary
+        # Convert strings to date objects if necessary; empty strings become NULL
         for field in ['fecha', 'fecha_carga', 'fecha_descarga']:
             if data.get(field):
                 data[field] = date.fromisoformat(data[field])
-        
+            elif field in data:
+                data[field] = None
+
         viaje = await service.create_viaje(data)
         return jsonify({"id": viaje.id}), 201
 
