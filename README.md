@@ -1,6 +1,8 @@
-# modulo_operacion
+# hub-ms-operacion
 
 Microservicio de Viajes / Operaciones del Hub Empresarial. Expone una API REST (Quart, async) para crear, listar, actualizar y eliminar viajes.
+
+Repos relacionados: [`hub-infra`](https://github.com/benjaminAndaur/hub-infra) (nginx, docker-compose, base de datos), [`hub-backends`](https://github.com/benjaminAndaur/hub-backends) (resto de microservicios), [`hub-ms-facturacion`](https://github.com/benjaminAndaur/hub-ms-facturacion) (microservicio hermano con BD propia), [`hub-frontends`](https://github.com/benjaminAndaur/hub-frontends).
 
 ## Persistencia de datos — Database per Service
 
@@ -8,7 +10,7 @@ A diferencia del resto de los módulos del Hub (que comparten la base de datos `
 
 - Motor: PostgreSQL 15.
 - Acceso: exclusivamente vía SQLAlchemy 2.0 async + asyncpg, desde la capa `src/repository`.
-- Schema inicial: [`hub-infra/db_operacion/init.sql`](../../hub-infra/db_operacion/init.sql) (tabla `viajes`, índices y datos semilla). El ORM además ejecuta `Base.metadata.create_all()` al arrancar como red de seguridad.
+- Schema inicial: [`hub-infra/db_operacion/init.sql`](https://github.com/benjaminAndaur/hub-infra/blob/main/db_operacion/init.sql) (tabla `viajes`, índices y datos semilla). El ORM además ejecuta `Base.metadata.create_all()` al arrancar como red de seguridad.
 - Variable de entorno: `DATABASE_URL=postgresql+asyncpg://admin:admin123@db-operacion:5432/operacion_db`.
 - Sin FK hacia otros módulos: `conductor_id`, `tracto_id`, `rampla_id`, `cliente_id` son IDs externos denormalizados (junto a su valor textual, ej. `conductor_nombre`). No hay integridad referencial entre microservicios, por diseño, para permitir despliegue e infraestructura de datos independientes.
 
@@ -30,7 +32,8 @@ src/
 
 **Standalone:**
 ```bash
-cd modulo_operacion
+git clone https://github.com/benjaminAndaur/hub-ms-operacion.git
+cd hub-ms-operacion
 pip install -r requirements.txt
 
 export DATABASE_URL=postgresql+asyncpg://admin:admin123@localhost:5432/operacion_db
@@ -39,7 +42,7 @@ export JWT_SECRET=super-secret-key-123
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**Stack completo:** desde `hub-infra`, `docker-compose up --build` (levanta `db-operacion` automáticamente).
+**Stack completo:** clonar este repo como hermano de `hub-infra`, `hub-backends` y `hub-frontends` (mismo directorio padre), luego desde `hub-infra` ejecutar `docker-compose up --build` (levanta `db-operacion` automáticamente).
 
 ## Cómo probar
 
