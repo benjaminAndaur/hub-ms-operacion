@@ -63,3 +63,7 @@ curl -H "Authorization: Bearer <token>" http://localhost:8080/api/v1/operacion/v
 | GET | `/api/v1/operacion/viajes` | `operacion:view` |
 | PUT | `/api/v1/operacion/viajes/<id>` | `operacion:edit` |
 | DELETE | `/api/v1/operacion/viajes/<id>` | `operacion:edit` |
+| GET | `/docs` | público (Swagger UI) |
+| GET | `/openapi.json` | público (contrato OpenAPI) |
+
+Contrato expuesto vía [`quart-schema`](https://pypi.org/project/quart-schema/) (`QuartSchema(app, swagger_ui_path="/docs")` en `main.py`) — uno de los 2 microservicios Python con OpenAPI activado, junto a `hub-backends/modulo_rrhh`.
