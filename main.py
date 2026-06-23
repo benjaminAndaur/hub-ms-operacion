@@ -14,7 +14,12 @@ app = cors(app, allow_origin="*",
            allow_headers=["Content-Type", "Authorization"],
            allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
-QuartSchema(app, info={"title": "Operacion", "version": "1.0"}, swagger_ui_path="/docs")
+QuartSchema(
+    app,
+    info={"title": "Operacion", "version": "1.0"},
+    swagger_ui_path="/docs",
+    openapi_path="/operacion-openapi.json",
+)
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://admin:admin123@db-global:5432/asdf_db")
 
