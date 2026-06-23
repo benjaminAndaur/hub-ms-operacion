@@ -2,6 +2,7 @@ import asyncio
 import os
 from quart import Quart, g
 from quart_cors import cors
+from quart_schema import QuartSchema
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from src.repository.operacion_repository import OperacionRepository
@@ -9,9 +10,11 @@ from src.service.operacion_service import OperacionService
 from src.controller.operacion_controller import create_operacion_blueprint
 
 app = Quart(__name__)
-app = cors(app, allow_origin="*", 
-           allow_headers=["Content-Type", "Authorization"], 
+app = cors(app, allow_origin="*",
+           allow_headers=["Content-Type", "Authorization"],
            allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+
+QuartSchema(app, info={"title": "Operacion", "version": "1.0"}, swagger_ui_path="/docs")
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://admin:admin123@db-global:5432/asdf_db")
 

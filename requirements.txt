@@ -4,6 +4,8 @@ sqlalchemy
 asyncpg
 quart
 quart-cors
+quart-schema
+typing_extensions
 python-dotenv
 PyJWT==2.8.0
 passlib==1.7.4
