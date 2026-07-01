@@ -115,3 +115,4 @@ Resultado: imagen de producción sin herramientas de compilación (menor superfi
 curl http://hub-empresarial-alb-1969847223.us-east-1.elb.amazonaws.com/api/v1/operacion/health
 # {"status": "ok", "db_status": "connected"}
 ```
+
