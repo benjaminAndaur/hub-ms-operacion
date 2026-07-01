@@ -67,3 +67,51 @@ curl -H "Authorization: Bearer <token>" http://localhost:8080/api/v1/operacion/v
 | GET | `/openapi.json` | público (contrato OpenAPI) |
 
 Contrato expuesto vía [`quart-schema`](https://pypi.org/project/quart-schema/) (`QuartSchema(app, swagger_ui_path="/docs")` en `main.py`) — uno de los 2 microservicios Python con OpenAPI activado, junto a `hub-backends/modulo_rrhh`.
+
+---
+
+## Despliegue en AWS — DevOps (ISY1101)
+
+### Arquitectura en producción
+
+```
+ALB → /api/v1/bff/* → hub-bff (ECS, :3000) → hub-ms-operacion (ECS, :5000)
+                                                    ↓
+                                         RDS operacion_db (:5432, privado)
+```
+
+- **Cluster:** `hub-empresarial-cluster` (AWS ECS Fargate)
+- **Imagen:** `720243276279.dkr.ecr.us-east-1.amazonaws.com/hub-ms-operacion:<sha>`
+- **Task Definition:** 256 CPU units / 512 MB RAM, role = `LabRole`
+- **Puerto:** 5000 (acceso interno desde hub-bff únicamente, no expuesto al ALB directamente)
+- **Base de datos:** RDS PostgreSQL `hub-empresarial-db`, base `operacion_db` (aislada)
+
+### Variables de entorno en producción (Task Definition ECS)
+
+| Variable | Valor en producción |
+|---|---|
+| `DATABASE_URL` | `postgresql+asyncpg://admin:<pass>@hub-empresarial-db.cksi39n77hia.us-east-1.rds.amazonaws.com:5432/operacion_db` |
+| `JWT_SECRET` | inyectado vía Task Definition (no en código) |
+
+### Pipeline CI/CD (GitHub Actions)
+
+Push a `main` → `.github/workflows/deploy.yml`:
+```
+checkout → AWS credentials → ECR login → docker build (multietapa) → push ECR → update task-def → deploy ECS
+```
+Duración: **~3m 47-51s**. Imágenes taggeadas con SHA del commit para trazabilidad completa.
+
+### Dockerfile multietapa
+
+- **Etapa `builder`:** `python:3.11-slim` + gcc/libpq-dev — instala dependencias compiladas
+- **Etapa final:** `python:3.11-slim` — solo runtime (libpq) + wheels precompilados
+
+Resultado: imagen de producción sin herramientas de compilación (menor superficie de ataque).
+
+### Verificar despliegue
+
+```bash
+# Health check (reporta db_status de operacion_db)
+curl http://hub-empresarial-alb-1969847223.us-east-1.elb.amazonaws.com/api/v1/operacion/health
+# {"status": "ok", "db_status": "connected"}
+```
